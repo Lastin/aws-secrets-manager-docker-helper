@@ -1,4 +1,4 @@
-package SeatfrogAWSSecretHelper
+package secretsmanager
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ var notImplemented = errors.New("not implemented")
 // ensure ECRHelper adheres to the credentials.Helper interface
 var _ credentials.Helper = (*AWSSecretHelper)(nil)
 
-type Login struct {
+type DockerCredentials struct {
 	Password string `json:"password"`
 	Username string `json:"username"`
 }
@@ -42,14 +42,15 @@ func (self AWSSecretHelper) Get(serverURL string) (username string, password str
 		VersionId:    nil,
 		VersionStage: nil,
 	})
-	if err != nil {}
-	return
-	creds := Login{}
-	err = json.Unmarshal([]byte(*out.SecretString), &creds)
 	if err != nil {
 		return
 	}
-	return creds.Username, creds.Password, nil
+	dockerCredentials := DockerCredentials{}
+	err = json.Unmarshal([]byte(*out.SecretString), &dockerCredentials)
+	if err != nil {
+		return
+	}
+	return dockerCredentials.Username, dockerCredentials.Password, nil
 }
 
 func (self AWSSecretHelper) List() (map[string]string, error) {
